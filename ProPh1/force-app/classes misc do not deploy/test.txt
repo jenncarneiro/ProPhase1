@@ -1,0 +1,116 @@
+ //create a list to test with
+List <Transaction__c> testTransactions = [SELECT ID, Name, Account__c, Account__r.Id 
+                                         FROM Transaction__c WHERE Account__c = '001D700001SyusMIAR' ]
+    for(Transaction__c t : testTransactions){
+        System.Debug('Transaction: ' + t.Name);
+    }
+System.Debug(testTransactions);
+
+
+
+
+////test code
+
+ //create a list to test with
+List <Transaction__c> testTransactions = [SELECT ID, Name, Account__c, Account__r.Id 
+                                         FROM Transaction__c WHERE Account__c = '001D700001SyusMIAR' ];
+List <Transaction__c> oldTransactions = [SELECT ID, Name, Account__c, Account__r.Id 
+                                         FROM Transaction__c WHERE Account__c = '001D700001SyusMIAR' ];
+Map<ID, Transaction__c> newTranMap = new Map<ID, Transaction__c>(testTransactions);
+Map<ID, Transaction__c> oldTranMap = new Map<ID, Transaction__c>(oldTransactions);
+
+    for(Transaction__c t : testTransactions){
+        System.Debug('Transaction: ' + t.Name);
+    }
+System.Debug(testTransactions);
+
+TransactionService.createTransactionShares(testTransactions,newTranMap,oldTransactions,oldTranMap);
+
+
+//getting users
+
+ //create a list of Accounts
+
+List<Account> acctList = [SELECT ID, Name FROM Account];
+System.Debug(acctList);
+
+//get user contacts for accounts
+
+List<User> userList = [SELECT ID, Name, Contact.AccountId, Contact.Primary_Affiliation__c  FROM USER 
+                       WHERE IsActive = TRUE 
+                       AND (User.Contact.Primary_Affiliation__c IN: acctList OR User.Contact.AccountId IN: acctList)];
+System.Debug(userList);
+
+
+
+js for job form pricing
+
+if(Active=="TRUE"&&Feat=="Yes"){MemFeat}else{if(Active=="TRUE"&&Feat=="No"){MemPrice}else{if(Active=="FALSE"&&Feat=="Yes"&&MemAssert=="FALSE"){NonMemFeat}else{if(Active=="FALSE"&&Feat=="No"&&MemAssert=="FALSE"){NonMemPrice}else{if(Feat=="Yes"&&MemAssert=="TRUE"){MemFeat}else{if(Feat=="No"&&MemAssert=="TRUE"){MemPrice}}}}}}
+
+
+
+System.Flow.Interview.Portal_Admin_Export_Members runFlow = new Flow.Interview.Portal_Admin_Export_Members('idhere');
+runFlow.start();
+
+
+
+
+testing member import stuff from execute anon
+
+
+
+//List <Member_Import__c> mylist = new List <Member_Import__c>();
+//create a list of Member Imports
+
+List<Member_Import__c> importList = [SELECT ID, Account__c, Account__r.Id, Member_Match_Import__c,Type__c FROM Member_Import__c WHERE Account__c = '001Aw00000OYtsIIAT'];
+
+System.Debug(importList);
+
+//create a map of Existing Members
+
+Map<Id, Member__c> existingMemberMap = new Map<Id, Member__c>([SELECT Id, Member__c, Member_Organization__c, Status__c 
+                                                             FROM Member__c 
+                                                              WHERE Member_Organization__c = '001Aw00000OYtsIIAT' AND Status__c = 'Current']);
+List<Member__c> existingMembers = new List<Member__c>(existingMemberMap.values());
+System.Debug('Existing Member Map: ');
+System.Debug(existingMemberMap);
+System.Debug('Existing Member List Before: ');
+System.Debug(existingMembers);
+
+//new list for deactivate members
+List<Member__c> existingMembersToDeactivate = new List<Member__c>();
+List<Integer> memberPositions = new List<Integer>();
+
+for(Member__c m : existingMembers){
+    //just run on all the records for testing concept
+    
+    existingMembersToDeactivate.add(m);
+    System.Debug('Members to Deactivate List after add: ');
+    System.Debug(existingMembersToDeactivate);
+    
+    Integer i = existingMembers.indexOf(m);
+    System.Debug('Existing Member Index for current item: ');
+    System.Debug(i);
+    
+    memberPositions.add(i);
+    System.Debug('Adding integer to position list: ');
+    System.Debug(memberPositions);
+
+    }
+
+//get a map of MemberImport match and id keys
+        Map<String,Id> memberImportMatchMap = new Map<String,Id>();
+        for(Member_Import__c mi : importList){
+            memberImportMatchMap.put(mi.Member_Match_Import__c,mi.Id);
+        }
+
+system.Debug('member import match map: ');
+System.Debug(memberImportMatchMap);
+
+List<Account> existingPersons = ([SELECT Id,Member_Match_Account__c, PersonEmail, LastName, PersonTitle 
+                                            FROM Account
+                                                WHERE Member_Match_Account__c IN :memberImportMatchMap.keySet() AND IsPersonAccount = TRUE]);
+
+System.Debug('matched persons list: ');
+System.Debug(existingPersons);
+

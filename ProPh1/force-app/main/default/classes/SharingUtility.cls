@@ -65,6 +65,7 @@ public without sharing class SharingUtility {
         
         //insert the transaction shares to the database
         try{
+            //System.debug('create transaction shares: '+newTranShares.size());
             Database.SaveResult[] lsr = Database.insert(newTranShares,false);
             
             //process save results for insert
@@ -76,39 +77,47 @@ public without sharing class SharingUtility {
                     if(!(err.getStatusCode() == StatusCode.FIELD_FILTER_VALIDATION_EXCEPTION && err.getMessage().contains('AccessLevel'))){
                         //this is a significant error and submitter should be notified
                         
+                        //re-write this to use EmailUtility
+                        String subject = 'Apex Transaction Sharing Calculation Exception';
+                        String body = 'The Apex Transaction Sharing Calculation threw the following exception: \n \n' + err.getMessage();
+                        String source = 'SharingUtility.processCreateTransactionShares try';
+                        List<String> addresses = new List<String>();
+                        Boolean apexRecip = TRUE;
                         
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-                        String [] toAddresses = em.emailList;
-                        mail.setToAddresses(toAddresses);
-                        mail.setSubject('Apex Transaction Sharing Calculation Exception');
-                        mail.setPlainTextBody('The Apex Transaction Sharing Calculation threw the following exception: ' + err.getMessage());
-                        if(toAddresses != null){// only send if there are recipients
-                            Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail}); 
-                        }
+                        EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
+                        
+                        //Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+                        //ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
+                        //String [] toAddresses = em.emailList;
+                        //mail.setToAddresses(toAddresses);
+                        //mail.setSubject('Apex Transaction Sharing Calculation Exception');
+                        // mail.setPlainTextBody('The Apex Transaction Sharing Calculation threw the following exception: ' + err.getMessage());
+                        // if(toAddresses != null){// only send if there are recipients
+                        //     Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail}); 
+                        
+                        //}
                     }
                 }
-            }         
-        }
+            }  
+        }       
         
-        catch(DmlException e){
+        
+        catch(Exception e){
             //send email on failure
             
+            //System.debug('Catch error transaction shares: '+e.getMessage());
             
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-            String [] toAddresses = em.emailList;
-            mail.setToAddresses(toAddresses); 
-            mail.setSubject('Apex Transaction Sharing Calculation Exception');
-            mail.setPlainTextBody(
-            'The Apex Transaction Sharing Calculation threw the following exception: ' + 
-            e.getMessage());
-            if(toAddresses != null){ // only send if there are recipients
-                
-                Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail}); 
-            }
+            String subject = 'Apex Transaction Sharing Calculation Exception';
+            String body = 'The Apex Transaction Sharing Calculation threw the following exception: \n \n' + e.getMessage();
+            String source = 'SharingUtility.processCreateTransactionShares catch';
+            List<String> addresses = new List<String>();
+            Boolean apexRecip = TRUE;
+            
+            EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
+            
             
         }  
+        
         
     }//end of method for TRANSACTION SHARES
     
@@ -177,6 +186,8 @@ public without sharing class SharingUtility {
         
         //insert the membership Shares to the database
         try{
+            //System.debug('create Membership shares: '+newMembershipShares.size());
+            
             Database.SaveResult[] lsr = Database.insert(newMembershipShares,false);
             
             //process save results for insert
@@ -184,38 +195,38 @@ public without sharing class SharingUtility {
                 if(!sr.isSuccess()){
                     //get the first save result error
                     Database.Error err = sr.getErrors()[0];
-                    //check if error is trivial, if it is failure is ok because the sharing records are not required.
+                    //check if error is trivial, if it is failure but is ok because the sharing records are simply not required.
                     if(!(err.getStatusCode() == StatusCode.FIELD_FILTER_VALIDATION_EXCEPTION && err.getMessage().contains('AccessLevel'))){
                         //this is a significant error and submitter should be notified
                         
-                        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-                        String [] toAddresses = em.emailList;
-                        mail.setToAddresses(toAddresses);
-                        mail.setSubject('Apex Membership Sharing Calculation Exception');
-                        mail.setPlainTextBody('The Apex Membership sharing Calculation threw the following exception: ' + err.getMessage());
-                        if(toAddresses != null){// only send if there are recipients
-                            Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail}); 
-                        }
                         
+                        String subject = 'Apex Membership Sharing Calculation Exception';
+                        String body = 'The Apex Membership Sharing Calculation threw the following exception: \n \n' + err.getMessage();
+                        String source = 'SharingUtility.processCreateMembershipShares try';
+                        List<String> addresses = new List<String>();
+                        Boolean apexRecip = TRUE;
+                        
+                        EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
+                        
+                             
                     }
                 }
             }  
             
         }
-        catch(DmlException e){
-            //send email on failure
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-            String [] toAddresses = em.emailList;
-            mail.setToAddresses(toAddresses); 
-            mail.setSubject('Apex Membership Sharing Calculation Exception');
-            mail.setPlainTextBody(
-            'The Apex Membership Sharing Calculation threw the following exception: ' + 
-            e.getMessage());
-            if(toAddresses != null){ // only send if there are recipients
-                Messaging.sendEmail(new Messaging.SingleEmailMessage[] {mail}); 
-            }
+        catch(Exception e){
+            //System.debug('Catch error transaction shares: '+e.getMessage());
+            
+            //send email on failure         
+                        
+            String subject = 'Apex Membership Sharing Calculation Exception';
+            String body = 'The Apex Membership Sharing Calculation threw the following exception: \n \n' + e.getMessage();
+            String source = 'SharingUtility.processCreateMembershipShares catch';
+            List<String> addresses = new List<String>();
+            Boolean apexRecip = TRUE;
+            
+            EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
+            
         }
     }   
     

@@ -31,24 +31,21 @@ global class MembershipSharingRecalc implements Database.Batchable<SObject> {
         Delete [SELECT Id FROM Membership__Share WHERE ParentId IN :membershipMap.keySet() AND RowCause = :Schema.Transaction__Share.rowCause.Key_Contact__c];
         
         //send the list of Transactions and Users to the Sharing Utility Class to map and create the needed shares
-        //SharingUtility.processCreateMembershipShares(membershipChunk, userList);   update name?      
+        SharingUtility.processCreateMembershipShares(membershipChunk, userList);        
         
     }
     
     global void finish(Database.BatchableContext BC){
-        // finish method to send email confirming completion
-
-        // add all the apex email recipients to the recipient list
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-        String [] toAddresses = em.emailList;
-        mail.setToAddresses(toAddresses); 
-
-        mail.setSubject('Apex Membership Sharing Recalculation Completed.');
-        mail.setPlainTextBody('The Apex Membership Sharing recalculation finished processing');
-        if (toAddresses != null) {
-            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail }); 
-        }   
+        // finish method to send email confirming completion           
+                        
+        String subject = 'Apex Membership Sharing Recalculation Completed.';
+        String body = 'The Apex Membership Sharing recalculation finished processing';
+        String source = 'MembershipSharingRecalc.finish';
+        List<String> addresses = new List<String>();
+        Boolean apexRecip = TRUE;
+        
+        EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
+          
     }    
 }
 

@@ -38,18 +38,13 @@ global class TransactionSharingRecalc implements Database.Batchable<SObject> {
     global void finish(Database.BatchableContext BC){
         // finish method to send email confirming completion
 
-        // add all the apex email recipients to the recipient list
-        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-        ApexEmailRecipientUtility em = ApexEmailRecipientUtility.getInstance();
-        String [] toAddresses = em.emailList;
-        mail.setToAddresses(toAddresses); 
-
-        mail.setSubject('Apex Transaction Sharing Recalculation Completed.');
-        mail.setPlainTextBody
-        ('The Apex Transaction sharing recalculation finished processing');
-        if(toAddresses != null){
-        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });    
-        }
+        String subject = 'Apex Transaction Sharing Recalculation Completed.';
+        String body = 'The Apex Transaction Sharing recalculation finished processing';
+        String source = 'TransactionSharingRecalc.finish';
+        List<String> addresses = new List<String>();
+        Boolean apexRecip = TRUE;
+        
+        EmailUtility.emailHelper(subject, body, source, addresses, apexRecip);
     }
     
     

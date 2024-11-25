@@ -1,0 +1,105 @@
+public class q346460 implements Database.Batchable<sObject> {
+    @InvocableMethod(description='Demo') public static String[] doThing(String[] input) {
+        Database.executeBatch(new q346460());
+        return input;
+    }
+    public Database.QueryLocator start(Database.BatchableContext context) {
+        return Database.getQueryLocator([SELECT Id FROM Account]);
+    }
+    public void execute(Database.BatchableContext context, Account[] scope) {
+        
+    }
+    public void finish(Database.BatchableContext context) {
+        
+    }
+}
+
+
+///***************
+public class CustomBatch implements Database.Batchable<SObject> {
+
+    @InvocableMethod
+    public static void executeCustomBatch() {
+        Id jobId = Database.executeBatch(new CustomBatch());
+    }
+
+    public Database.QueryLocator start(Database.BatchableContext context) {
+        System.debug('Inside start method');
+        // Add your custom logic here
+        return Database.getQueryLocator([SELECT Name FROM Account LIMIT 51]);
+    }
+
+    public void execute(Database.BatchableContext context, List<SObject> scope) {
+        System.debug('Inside execute method');
+        // Add your custom logic here
+    }
+
+    public void finish(Database.BatchableContext context) {
+        System.debug('Inside finish method');
+        // Add your custom logic here
+    }
+} 
+///
+//*********************************
+
+public class BatchApexFromFlow implements Database.Batchable<sObject> {
+
+    public List<Id> CONLIST = new List<Id>();
+
+    public BatchApexFromFlow(List<Id> conlist)
+
+    {
+
+        this.CONLIST = conlist;
+
+    }
+
+    public class FlowInputs {
+
+        @InvocableVariable public List<Id> ConId;
+
+    }
+
+    @invocablemethod
+
+    public static void sendEmail(List<FlowInputs> requests)
+
+    {
+
+        List<Id> conlist = new List<Id>();
+
+        for(FlowInputs req : requests)   
+
+        {
+
+            conlist.addAll(req.conId);
+
+        }
+
+        Id jobId = Database.executeBatch(new BatchApexFromFlow(conlist));
+
+    }
+
+   public Database.QueryLocator start(Database.BatchableContext BC){
+
+      String query = 'SELECT ID, EMAIL FROM CONTACT WHERE ID IN : CONLIST';
+
+      return Database.getQueryLocator(query);
+
+   }
+
+    public void execute(Database.BatchableContext BC , List<Sobject> scope){
+
+        for(Contact c : (List<Contact>)scope) {
+
+            system.debug('email:: '+c.Email);
+
+        }
+
+   }
+
+   public void finish(Database.BatchableContext BC){
+
+   }
+
+}
