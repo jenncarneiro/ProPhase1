@@ -25,7 +25,7 @@ global class TransactionSharingRecalc implements Database.Batchable<SObject> {
         List<Account> acctList = [SELECT ID, Name FROM Account WHERE Id IN: acctIds];
         
         // get the users to create new shares for
-        List<User> userList = [SELECT ID, Name, Contact.AccountId, Contact.Primary_Affiliation__c FROM USER WHERE IsActive = TRUE AND UserType = 'PowerCustomerSuccess' AND (User.Contact.Primary_Affiliation__c IN: acctIds OR User.Contact.AccountId IN: acctIds)];
+        List<User> userList = [SELECT ID, Name, Account.Id, Contact.AccountId, Contact.Primary_Affiliation__c, Contact.Primary_Affiliation__r.Id, UserType FROM USER WHERE IsActive = TRUE AND UserType = 'PowerCustomerSuccess' AND (User.Contact.Primary_Affiliation__c IN: acctIds OR User.Contact.AccountId IN: acctIds)];
         
         //Locate all apex shared existing records for the transactions in the batch so we can delete these old shares
         Delete [SELECT Id FROM Transaction__Share WHERE ParentId IN :transactionMap.keySet() AND RowCause = :Schema.Transaction__Share.rowCause.Key_Contact__c];
